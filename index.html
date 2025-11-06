@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giải Phương Trình Bậc 2</title>
+    <title>Hệ Thống Theo Dõi Điện Tim - ECG Monitor</title>
     <style>
         * {
             margin: 0;
@@ -13,336 +13,745 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            background: #0a0a0a;
+            color: #fff;
+            overflow: hidden;
+            position: relative;
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-            max-width: 500px;
             width: 100%;
-        }
-
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .equation {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .equation span {
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .button-group {
+            height: 100vh;
             display: flex;
-            gap: 10px;
-            margin-top: 25px;
+            flex-direction: column;
         }
 
-        button {
-            flex: 1;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .solve-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .heart-icon {
+            width: 40px;
+            height: 40px;
+            background: #ff4757;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .datetime {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Vital Signs Panel */
+        .vital-signs {
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .vital-card {
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #16213e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vital-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: currentColor;
+        }
+
+        .vital-card.hr { color: #00ff00; }
+        .vital-card.bp { color: #00bfff; }
+        .vital-card.spo2 { color: #ffff00; }
+        .vital-card.temp { color: #ff6b6b; }
+        .vital-card.resp { color: #00ffff; }
+
+        .vital-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .vital-value {
+            font-size: 36px;
+            font-weight: bold;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .vital-unit {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .vital-subvalue {
+            font-size: 18px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* ECG Display */
+        .ecg-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ecg-controls {
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        select, button {
+            background: #0f3460;
+            color: #fff;
+            border: 1px solid #16213e;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        select:hover, button:hover {
+            background: #16213e;
+        }
+
+        button.active {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .ecg-monitor {
+            flex: 1;
+            background: #000;
+            border-radius: 10px;
+            border: 2px solid #1a1a2e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ecg-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, #0f3460 0, #0f3460 1px, transparent 1px, transparent 20px),
+                repeating-linear-gradient(90deg, #0f3460 0, #0f3460 1px, transparent 1px, transparent 20px);
+            opacity: 0.3;
+        }
+
+        .ecg-channel {
+            position: relative;
+            height: 25%;
+            border-bottom: 1px solid #1a1a2e;
+        }
+
+        .ecg-channel:last-child {
+            border-bottom: none;
+        }
+
+        .channel-label {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 12px;
+            color: #00ff00;
+            background: #000;
+            padding: 2px 8px;
+            border-radius: 3px;
+            z-index: 10;
+        }
+
+        .ecg-wave {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #1a1a2e;
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .alarm-panel {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(255, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: alarmBlink 0.5s infinite;
+        }
+
+        @keyframes alarmBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .alarm-panel.active {
+            display: block;
+        }
+
+        /* Patient Info Modal */
+        .patient-info {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #16213e;
+            display: none;
+            z-index: 1000;
+            min-width: 400px;
+        }
+
+        .patient-info.active {
+            display: block;
+        }
+
+        .patient-info h2 {
+            margin-bottom: 20px;
+            color: #00ff00;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: #0f3460;
+            border-radius: 5px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4757;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
             color: white;
         }
 
-        .solve-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .reset-btn {
-            background: #f5f5f5;
-            color: #666;
-        }
-
-        .reset-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .result.show {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            
+            .vital-signs {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
             }
-        }
-
-        .result-title {
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .result-content {
-            color: #555;
-            line-height: 1.8;
-        }
-
-        .result-content strong {
-            color: #667eea;
-            font-size: 18px;
-        }
-
-        .error {
-            background: #fee;
-            border-left: 4px solid #f44336;
-        }
-
-        .success {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
-        }
-
-        .warning {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
-        }
-
-        .steps {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
-        }
-
-        .step {
-            margin: 10px 0;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            font-size: 14px;
+            
+            .vital-card {
+                min-width: 150px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧮 Giải Phương Trình Bậc 2 (by Minh Hung)</h1>
-        <div class="equation">
-            <span>ax²</span> + <span>bx</span> + <span>c</span> = 0
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="heart-icon">❤️</div>
+                <h1>ECG Monitor Pro</h1>
+            </div>
+            <div class="datetime" id="datetime"></div>
         </div>
 
-        <form id="quadraticForm">
-            <div class="input-group">
-                <label for="a">Hệ số a (a ≠ 0):</label>
-                <input type="number" id="a" step="any" required>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Vital Signs Panel -->
+            <div class="vital-signs">
+                <div class="vital-card hr">
+                    <div class="vital-label">NHỊP TIM</div>
+                    <div class="vital-value">
+                        <span id="heartRate">72</span>
+                        <span class="vital-unit">bpm</span>
+                    </div>
+                </div>
+
+                <div class="vital-card bp">
+                    <div class="vital-label">HUYẾT ÁP</div>
+                    <div class="vital-value">
+                        <span id="bpSys">120</span>
+                        <span class="vital-unit">mmHg</span>
+                    </div>
+                    <div class="vital-subvalue" id="bpDia">80 mmHg</div>
+                </div>
+
+                <div class="vital-card spo2">
+                    <div class="vital-label">SpO₂</div>
+                    <div class="vital-value">
+                        <span id="spo2">98</span>
+                        <span class="vital-unit">%</span>
+                    </div>
+                </div>
+
+                <div class="vital-card temp">
+                    <div class="vital-label">NHIỆT ĐỘ</div>
+                    <div class="vital-value">
+                        <span id="temp">36.8</span>
+                        <span class="vital-unit">°C</span>
+                    </div>
+                </div>
+
+                <div class="vital-card resp">
+                    <div class="vital-label">NHỊP THỞ</div>
+                    <div class="vital-value">
+                        <span id="respRate">16</span>
+                        <span class="vital-unit">bpm</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="input-group">
-                <label for="b">Hệ số b:</label>
-                <input type="number" id="b" step="any" required>
-            </div>
+            <!-- ECG Display -->
+            <div class="ecg-display">
+                <div class="ecg-controls">
+                    <div class="control-group">
+                        <label>Tốc độ:</label>
+                        <select id="speed">
+                            <option value="25">25 mm/s</option>
+                            <option value="50" selected>50 mm/s</option>
+                            <option value="100">100 mm/s</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Độ nhạy:</label>
+                        <select id="sensitivity">
+                            <option value="5">5 mm/mV</option>
+                            <option value="10" selected>10 mm/mV</option>
+                            <option value="20">20 mm/mV</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Lead:</label>
+                        <select id="lead">
+                            <option value="I">Lead I</option>
+                            <option value="II" selected>Lead II</option>
+                            <option value="III">Lead III</option>
+                            <option value="aVR">aVR</option>
+                            <option value="aVL">aVL</option>
+                            <option value="aVF">aVF</option>
+                        </select>
+                    </div>
+                    <button id="pauseBtn" onclick="togglePause()">⏸️ TẠM DỪNG</button>
+                    <button onclick="showPatientInfo()">👤 BỆNH NHÂN</button>
+                    <button onclick="printECG()">🖨️ IN</button>
+                    <button id="alarmBtn" onclick="toggleAlarm()">🔔 BÁO ĐỘNG</button>
+                </div>
 
-            <div class="input-group">
-                <label for="c">Hệ số c:</label>
-                <input type="number" id="c" step="any" required>
+                <div class="ecg-monitor">
+                    <div class="ecg-grid"></div>
+                    
+                    <div class="ecg-channel">
+                        <span class="channel-label">Lead II</span>
+                        <canvas class="ecg-wave" id="ecgCanvas1"></canvas>
+                    </div>
+                    
+                    <div class="ecg-channel">
+                        <span class="channel-label">Lead V1</span>
+                        <canvas class="ecg-wave" id="ecgCanvas2"></canvas>
+                    </div>
+                    
+                    <div class="ecg-channel">
+                        <span class="channel-label">Lead V5</span>
+                        <canvas class="ecg-wave" id="ecgCanvas3"></canvas>
+                    </div>
+                    
+                    <div class="ecg-channel">
+                        <span class="channel-label">SpO₂</span>
+                        <canvas class="ecg-wave" id="ecgCanvas4"></canvas>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <div class="button-group">
-                <button type="submit" class="solve-btn">Giải Phương Trình</button>
-                <button type="button" class="reset-btn" onclick="resetForm()">Làm Mới</button>
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-indicator"></span>
+                <span>Kết nối ổn định</span>
             </div>
-        </form>
+            <div class="status-item">
+                <span>Pin: 85%</span>
+            </div>
+            <div class="status-item">
+                <span>Bộ nhớ: 2.3 GB khả dụng</span>
+            </div>
+            <div class="status-item">
+                <span>Ghi: 00:15:23</span>
+            </div>
+        </div>
 
-        <div id="result" class="result"></div>
+        <!-- Alarm Panel -->
+        <div class="alarm-panel" id="alarmPanel">
+            <h3>⚠️ CẢNH BÁO</h3>
+            <p>Nhịp tim bất thường!</p>
+            <p>HR > 100 bpm</p>
+        </div>
+
+        <!-- Patient Info Modal -->
+        <div class="patient-info" id="patientInfo">
+            <button class="close-btn" onclick="closePatientInfo()">✕</button>
+            <h2>Thông Tin Bệnh Nhân</h2>
+            <div class="info-row">
+                <span>Họ tên:</span>
+                <span>Nguyễn Văn A</span>
+            </div>
+            <div class="info-row">
+                <span>Mã BN:</span>
+                <span>BN2024001</span>
+            </div>
+            <div class="info-row">
+                <span>Tuổi:</span>
+                <span>45</span>
+            </div>
+            <div class="info-row">
+                <span>Giới tính:</span>
+                <span>Nam</span>
+            </div>
+            <div class="info-row">
+                <span>Phòng:</span>
+                <span>ICU-01</span>
+            </div>
+            <div class="info-row">
+                <span>Ngày nhập viện:</span>
+                <span>15/03/2024</span>
+            </div>
+            <div class="info-row">
+                <span>Chẩn đoán:</span>
+                <span>Rối loạn nhịp tim</span>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('quadraticForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            solveQuadratic();
+        // Update datetime
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('datetime').textContent = 
+                now.toLocaleDateString('vi-VN', options);
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // ECG Wave Animation
+        class ECGWave {
+            constructor(canvasId, color = '#00ff00') {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.color = color;
+                this.x = 0;
+                this.data = [];
+                this.isPaused = false;
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                // Generate initial ECG data
+                this.generateECGData();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = this.canvas.offsetWidth;
+                this.canvas.height = this.canvas.offsetHeight;
+            }
+
+            generateECGData() {
+                // Generate realistic ECG pattern
+                const pattern = [];
+                
+                // P wave
+                for(let i = 0; i < 10; i++) {
+                    pattern.push(Math.sin(i * 0.3) * 10);
+                }
+                
+                // Baseline
+                for(let i = 0; i < 15; i++) {
+                    pattern.push(0);
+                }
+                
+                // QRS complex
+                pattern.push(-15); // Q
+                pattern.push(60);  // R
+                pattern.push(-10); // S
+                
+                // Baseline
+                for(let i = 0; i < 20; i++) {
+                    pattern.push(0);
+                }
+                
+                // T wave
+                for(let i = 0; i < 15; i++) {
+                    pattern.push(Math.sin(i * 0.2) * 20);
+                }
+                
+                // Baseline
+                for(let i = 0; i < 40; i++) {
+                    pattern.push(0);
+                }
+                
+                this.data = pattern;
+            }
+
+            animate() {
+                if (!this.isPaused) {
+                    this.draw();
+                }
+                requestAnimationFrame(() => this.animate());
+            }
+
+            draw() {
+                const { width, height } = this.canvas;
+                const centerY = height / 2;
+                
+                // Clear the swept area
+                this.ctx.fillStyle = '#000';
+                this.ctx.fillRect(this.x, 0, 50, height);
+                
+                // Draw the ECG wave
+                this.ctx.strokeStyle = this.color;
+                this.ctx.lineWidth = 2;
+                this.ctx.shadowBlur = 4;
+                this.ctx.shadowColor = this.color;
+                
+                this.ctx.beginPath();
+                
+                const dataIndex = Math.floor(this.x / 2) % this.data.length;
+                const startX = Math.max(0, this.x - 200);
+                
+                for(let i = startX; i < this.x; i += 2) {
+                    const idx = Math.floor(i / 2) % this.data.length;
+                    const y = centerY - this.data[idx];
+                    
+                    if(i === startX) {
+                        this.ctx.moveTo(i, y);
+                    } else {
+                        this.ctx.lineTo(i, y);
+                    }
+                }
+                
+                this.ctx.stroke();
+                
+                // Draw the sweep line
+                this.ctx.strokeStyle = '#ffffff30';
+                this.ctx.lineWidth = 1;
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.x + 5, 0);
+                this.ctx.lineTo(this.x + 5, height);
+                this.ctx.stroke();
+                
+                // Update position
+                this.x += 2;
+                if(this.x > width) {
+                    this.x = 0;
+                }
+            }
+
+            pause() {
+                this.isPaused = true;
+            }
+
+            resume() {
+                this.isPaused = false;
+            }
+        }
+
+        // Initialize ECG waves
+        const ecg1 = new ECGWave('ecgCanvas1', '#00ff00');
+        const ecg2 = new ECGWave('ecgCanvas2', '#00ff00');
+        const ecg3 = new ECGWave('ecgCanvas3', '#00ff00');
+        const ecg4 = new ECGWave('ecgCanvas4', '#ffff00');
+
+        // Simulate vital signs changes
+        function updateVitalSigns() {
+            const hr = document.getElementById('heartRate');
+            const currentHR = parseInt(hr.textContent);
+            const newHR = currentHR + Math.floor(Math.random() * 5 - 2);
+            hr.textContent = Math.max(60, Math.min(100, newHR));
+            
+            const spo2 = document.getElementById('spo2');
+            const currentSpO2 = parseInt(spo2.textContent);
+            const newSpO2 = currentSpO2 + Math.floor(Math.random() * 3 - 1);
+            spo2.textContent = Math.max(95, Math.min(100, newSpO2));
+            
+            const temp = document.getElementById('temp');
+            const currentTemp = parseFloat(temp.textContent);
+            const newTemp = currentTemp + (Math.random() * 0.2 - 0.1);
+            temp.textContent = Math.max(36.0, Math.min(37.5, newTemp)).toFixed(1);
+            
+            const resp = document.getElementById('respRate');
+            const currentResp = parseInt(resp.textContent);
+            const newResp = currentResp + Math.floor(Math.random() * 3 - 1);
+            resp.textContent = Math.max(12, Math.min(20, newResp));
+
+            // Check for alarms
+            if(parseInt(hr.textContent) > 90) {
+                document.getElementById('alarmPanel').classList.add('active');
+            }
+        }
+        setInterval(updateVitalSigns, 3000);
+
+        // Control functions
+        let isPaused = false;
+        function togglePause() {
+            isPaused = !isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if(isPaused) {
+                ecg1.pause();
+                ecg2.pause();
+                ecg3.pause();
+                ecg4.pause();
+                btn.textContent = '▶️ TIẾP TỤC';
+                btn.classList.add('active');
+            } else {
+                ecg1.resume();
+                ecg2.resume();
+                ecg3.resume();
+                ecg4.resume();
+                btn.textContent = '⏸️ TẠM DỪNG';
+                btn.classList.remove('active');
+            }
+        }
+
+        function showPatientInfo() {
+            document.getElementById('patientInfo').classList.add('active');
+        }
+
+        function closePatientInfo() {
+            document.getElementById('patientInfo').classList.remove('active');
+        }
+
+        function toggleAlarm() {
+            const panel = document.getElementById('alarmPanel');
+            panel.classList.toggle('active');
+        }
+
+        function printECG() {
+            window.print();
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if(e.key === ' ') {
+                e.preventDefault();
+                togglePause();
+            }
+            if(e.key === 'Escape') {
+                closePatientInfo();
+            }
         });
 
-        function solveQuadratic() {
-            // Lấy giá trị từ form
-            const a = parseFloat(document.getElementById('a').value);
-            const b = parseFloat(document.getElementById('b').value);
-            const c = parseFloat(document.getElementById('c').value);
-            const resultDiv = document.getElementById('result');
-
-            // Kiểm tra điều kiện a ≠ 0
-            if (a === 0) {
-                resultDiv.className = 'result show error';
-                resultDiv.innerHTML = `
-                    <div class="result-title">❌ Lỗi</div>
-                    <div class="result-content">
-                        Hệ số <strong>a</strong> phải khác 0 để có phương trình bậc 2!
-                    </div>
-                `;
-                return;
-            }
-
-            // Hiển thị phương trình
-            let equation = `${a}x² `;
-            equation += b >= 0 ? `+ ${b}x ` : `- ${Math.abs(b)}x `;
-            equation += c >= 0 ? `+ ${c}` : `- ${Math.abs(c)}`;
-            equation += ' = 0';
-
-            // Tính delta (Δ = b² - 4ac)
-            const delta = b * b - 4 * a * c;
-            
-            let resultHTML = `
-                <div class="result-title">📊 Kết Quả</div>
-                <div class="result-content">
-                    <div><strong>Phương trình:</strong> ${equation}</div>
-                    <div class="steps">
-                        <div class="step">
-                            <strong>Bước 1:</strong> Tính Delta (Δ)<br>
-                            Δ = b² - 4ac = ${b}² - 4×${a}×${c} = <strong>${delta.toFixed(2)}</strong>
-                        </div>
-            `;
-
-            if (delta > 0) {
-                // Hai nghiệm phân biệt
-                const sqrtDelta = Math.sqrt(delta);
-                const x1 = (-b + sqrtDelta) / (2 * a);
-                const x2 = (-b - sqrtDelta) / (2 * a);
-                
-                resultDiv.className = 'result show success';
-                resultHTML += `
-                    <div class="step">
-                        <strong>Bước 2:</strong> Vì Δ > 0, phương trình có 2 nghiệm phân biệt<br>
-                        √Δ = ${sqrtDelta.toFixed(4)}
-                    </div>
-                    <div class="step">
-                        <strong>Bước 3:</strong> Tính nghiệm<br>
-                        x₁ = (-b + √Δ) / 2a = (${-b} + ${sqrtDelta.toFixed(4)}) / ${2*a}<br>
-                        x₂ = (-b - √Δ) / 2a = (${-b} - ${sqrtDelta.toFixed(4)}) / ${2*a}
-                    </div>
-                    </div>
-                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
-                        <strong style="color: #4caf50;">✅ Nghiệm của phương trình:</strong><br>
-                        <div style="margin-top: 10px; font-size: 20px;">
-                            x₁ = <strong>${x1.toFixed(4)}</strong><br>
-                            x₂ = <strong>${x2.toFixed(4)}</strong>
-                        </div>
-                    </div>
-                `;
-            } else if (delta === 0) {
-                // Nghiệm kép
-                const x = -b / (2 * a);
-                
-                resultDiv.className = 'result show warning';
-                resultHTML += `
-                    <div class="step">
-                        <strong>Bước 2:</strong> Vì Δ = 0, phương trình có nghiệm kép
-                    </div>
-                    <div class="step">
-                        <strong>Bước 3:</strong> Tính nghiệm<br>
-                        x = -b / 2a = ${-b} / ${2*a}
-                    </div>
-                    </div>
-                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
-                        <strong style="color: #ff9800;">⚠️ Nghiệm kép:</strong><br>
-                        <div style="margin-top: 10px; font-size: 20px;">
-                            x₁ = x₂ = <strong>${x.toFixed(4)}</strong>
-                        </div>
-                    </div>
-                `;
-            } else {
-                // Vô nghiệm (trong tập số thực)
-                const realPart = (-b / (2 * a)).toFixed(4);
-                const imaginaryPart = (Math.sqrt(-delta) / (2 * a)).toFixed(4);
-                
-                resultDiv.className = 'result show error';
-                resultHTML += `
-                    <div class="step">
-                        <strong>Bước 2:</strong> Vì Δ < 0, phương trình vô nghiệm trong tập số thực
-                    </div>
-                    </div>
-                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
-                        <strong style="color: #f44336;">❌ Phương trình vô nghiệm thực</strong><br>
-                        <div style="margin-top: 10px;">
-                            <em>Nghiệm phức:</em><br>
-                            x₁ = ${realPart} + ${imaginaryPart}i<br>
-                            x₂ = ${realPart} - ${imaginaryPart}i
-                        </div>
-                    </div>
-                `;
-            }
-
-            resultHTML += '</div>';
-            resultDiv.innerHTML = resultHTML;
-        }
-
-        function resetForm() {
-            document.getElementById('quadraticForm').reset();
-            document.getElementById('result').className = 'result';
-            document.getElementById('result').innerHTML = '';
-        }
-
-        // Thêm ví dụ mẫu khi trang load
-        window.onload = function() {
-            document.getElementById('a').placeholder = 'Ví dụ: 1';
-            document.getElementById('b').placeholder = 'Ví dụ: -3';
-            document.getElementById('c').placeholder = 'Ví dụ: 2';
+        // Sound effect for heartbeat (optional)
+        function playHeartbeat() {
+            // This would require an audio file
+            // const audio = new Audio('heartbeat.mp3');
+            // audio.play();
         }
     </script>
 </body>
