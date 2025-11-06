@@ -1,1 +1,349 @@
-<p> Đây là website của Hùng </p>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giải Phương Trình Bậc 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .equation {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .equation span {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .solve-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .solve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-btn {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-title {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .result-content {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .result-content strong {
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fee;
+            border-left: 4px solid #f44336;
+        }
+
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .steps {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Giải Phương Trình Bậc 2 (by Minh Hung)</h1>
+        <div class="equation">
+            <span>ax²</span> + <span>bx</span> + <span>c</span> = 0
+        </div>
+
+        <form id="quadraticForm">
+            <div class="input-group">
+                <label for="a">Hệ số a (a ≠ 0):</label>
+                <input type="number" id="a" step="any" required>
+            </div>
+
+            <div class="input-group">
+                <label for="b">Hệ số b:</label>
+                <input type="number" id="b" step="any" required>
+            </div>
+
+            <div class="input-group">
+                <label for="c">Hệ số c:</label>
+                <input type="number" id="c" step="any" required>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="solve-btn">Giải Phương Trình</button>
+                <button type="button" class="reset-btn" onclick="resetForm()">Làm Mới</button>
+            </div>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('quadraticForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            solveQuadratic();
+        });
+
+        function solveQuadratic() {
+            // Lấy giá trị từ form
+            const a = parseFloat(document.getElementById('a').value);
+            const b = parseFloat(document.getElementById('b').value);
+            const c = parseFloat(document.getElementById('c').value);
+            const resultDiv = document.getElementById('result');
+
+            // Kiểm tra điều kiện a ≠ 0
+            if (a === 0) {
+                resultDiv.className = 'result show error';
+                resultDiv.innerHTML = `
+                    <div class="result-title">❌ Lỗi</div>
+                    <div class="result-content">
+                        Hệ số <strong>a</strong> phải khác 0 để có phương trình bậc 2!
+                    </div>
+                `;
+                return;
+            }
+
+            // Hiển thị phương trình
+            let equation = `${a}x² `;
+            equation += b >= 0 ? `+ ${b}x ` : `- ${Math.abs(b)}x `;
+            equation += c >= 0 ? `+ ${c}` : `- ${Math.abs(c)}`;
+            equation += ' = 0';
+
+            // Tính delta (Δ = b² - 4ac)
+            const delta = b * b - 4 * a * c;
+            
+            let resultHTML = `
+                <div class="result-title">📊 Kết Quả</div>
+                <div class="result-content">
+                    <div><strong>Phương trình:</strong> ${equation}</div>
+                    <div class="steps">
+                        <div class="step">
+                            <strong>Bước 1:</strong> Tính Delta (Δ)<br>
+                            Δ = b² - 4ac = ${b}² - 4×${a}×${c} = <strong>${delta.toFixed(2)}</strong>
+                        </div>
+            `;
+
+            if (delta > 0) {
+                // Hai nghiệm phân biệt
+                const sqrtDelta = Math.sqrt(delta);
+                const x1 = (-b + sqrtDelta) / (2 * a);
+                const x2 = (-b - sqrtDelta) / (2 * a);
+                
+                resultDiv.className = 'result show success';
+                resultHTML += `
+                    <div class="step">
+                        <strong>Bước 2:</strong> Vì Δ > 0, phương trình có 2 nghiệm phân biệt<br>
+                        √Δ = ${sqrtDelta.toFixed(4)}
+                    </div>
+                    <div class="step">
+                        <strong>Bước 3:</strong> Tính nghiệm<br>
+                        x₁ = (-b + √Δ) / 2a = (${-b} + ${sqrtDelta.toFixed(4)}) / ${2*a}<br>
+                        x₂ = (-b - √Δ) / 2a = (${-b} - ${sqrtDelta.toFixed(4)}) / ${2*a}
+                    </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                        <strong style="color: #4caf50;">✅ Nghiệm của phương trình:</strong><br>
+                        <div style="margin-top: 10px; font-size: 20px;">
+                            x₁ = <strong>${x1.toFixed(4)}</strong><br>
+                            x₂ = <strong>${x2.toFixed(4)}</strong>
+                        </div>
+                    </div>
+                `;
+            } else if (delta === 0) {
+                // Nghiệm kép
+                const x = -b / (2 * a);
+                
+                resultDiv.className = 'result show warning';
+                resultHTML += `
+                    <div class="step">
+                        <strong>Bước 2:</strong> Vì Δ = 0, phương trình có nghiệm kép
+                    </div>
+                    <div class="step">
+                        <strong>Bước 3:</strong> Tính nghiệm<br>
+                        x = -b / 2a = ${-b} / ${2*a}
+                    </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                        <strong style="color: #ff9800;">⚠️ Nghiệm kép:</strong><br>
+                        <div style="margin-top: 10px; font-size: 20px;">
+                            x₁ = x₂ = <strong>${x.toFixed(4)}</strong>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Vô nghiệm (trong tập số thực)
+                const realPart = (-b / (2 * a)).toFixed(4);
+                const imaginaryPart = (Math.sqrt(-delta) / (2 * a)).toFixed(4);
+                
+                resultDiv.className = 'result show error';
+                resultHTML += `
+                    <div class="step">
+                        <strong>Bước 2:</strong> Vì Δ < 0, phương trình vô nghiệm trong tập số thực
+                    </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                        <strong style="color: #f44336;">❌ Phương trình vô nghiệm thực</strong><br>
+                        <div style="margin-top: 10px;">
+                            <em>Nghiệm phức:</em><br>
+                            x₁ = ${realPart} + ${imaginaryPart}i<br>
+                            x₂ = ${realPart} - ${imaginaryPart}i
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultHTML += '</div>';
+            resultDiv.innerHTML = resultHTML;
+        }
+
+        function resetForm() {
+            document.getElementById('quadraticForm').reset();
+            document.getElementById('result').className = 'result';
+            document.getElementById('result').innerHTML = '';
+        }
+
+        // Thêm ví dụ mẫu khi trang load
+        window.onload = function() {
+            document.getElementById('a').placeholder = 'Ví dụ: 1';
+            document.getElementById('b').placeholder = 'Ví dụ: -3';
+            document.getElementById('c').placeholder = 'Ví dụ: 2';
+        }
+    </script>
+</body>
+</html>
