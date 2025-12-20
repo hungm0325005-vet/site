@@ -3,755 +3,837 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Theo Dõi Điện Tim - ECG Monitor</title>
+    <title>VetLab Blood Parasites Diagnose by Minh Hung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#7c3aed',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a0a;
-            color: #fff;
-            overflow: hidden;
-            position: relative;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-
-        .container {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .heart-icon {
-            width: 40px;
-            height: 40px;
-            background: #ff4757;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .datetime {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            padding: 20px;
-            gap: 20px;
-        }
-
-        /* Vital Signs Panel */
-        .vital-signs {
-            width: 250px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .vital-card {
-            background: #1a1a2e;
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid #16213e;
+        
+        .gradient-border {
             position: relative;
             overflow: hidden;
         }
-
-        .vital-card::before {
+        
+        .gradient-border::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
-            height: 100%;
-            background: currentColor;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
         }
-
-        .vital-card.hr { color: #00ff00; }
-        .vital-card.bp { color: #00bfff; }
-        .vital-card.spo2 { color: #ffff00; }
-        .vital-card.temp { color: #ff6b6b; }
-        .vital-card.resp { color: #00ffff; }
-
-        .vital-label {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-bottom: 5px;
+        
+        .pulse {
+            animation: pulse 2s infinite;
         }
-
-        .vital-value {
-            font-size: 36px;
-            font-weight: bold;
-            display: flex;
-            align-items: baseline;
-            gap: 5px;
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
-
-        .vital-unit {
-            font-size: 14px;
-            opacity: 0.7;
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
         }
-
-        .vital-subvalue {
-            font-size: 18px;
-            opacity: 0.8;
-            margin-top: 5px;
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-
-        /* ECG Display */
-        .ecg-display {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        
+        .spin {
+            animation: spin 1s linear infinite;
         }
-
-        .ecg-controls {
-            background: #1a1a2e;
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .control-group label {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        select, button {
-            background: #0f3460;
-            color: #fff;
-            border: 1px solid #16213e;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        select:hover, button:hover {
-            background: #16213e;
-        }
-
-        button.active {
-            background: #00ff00;
-            color: #000;
-        }
-
-        .ecg-monitor {
-            flex: 1;
-            background: #000;
-            border-radius: 10px;
-            border: 2px solid #1a1a2e;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ecg-grid {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(0deg, #0f3460 0, #0f3460 1px, transparent 1px, transparent 20px),
-                repeating-linear-gradient(90deg, #0f3460 0, #0f3460 1px, transparent 1px, transparent 20px);
-            opacity: 0.3;
-        }
-
-        .ecg-channel {
-            position: relative;
-            height: 25%;
-            border-bottom: 1px solid #1a1a2e;
-        }
-
-        .ecg-channel:last-child {
-            border-bottom: none;
-        }
-
-        .channel-label {
-            position: absolute;
-            top: 5px;
-            left: 10px;
-            font-size: 12px;
-            color: #00ff00;
-            background: #000;
-            padding: 2px 8px;
-            border-radius: 3px;
-            z-index: 10;
-        }
-
-        .ecg-wave {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Status Bar */
-        .status-bar {
-            background: #1a1a2e;
-            padding: 10px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #00ff00;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .alarm-panel {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: rgba(255, 0, 0, 0.9);
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-            animation: alarmBlink 0.5s infinite;
-        }
-
-        @keyframes alarmBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .alarm-panel.active {
-            display: block;
-        }
-
-        /* Patient Info Modal */
-        .patient-info {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #1a1a2e;
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #16213e;
-            display: none;
-            z-index: 1000;
-            min-width: 400px;
-        }
-
-        .patient-info.active {
-            display: block;
-        }
-
-        .patient-info h2 {
-            margin-bottom: 20px;
-            color: #00ff00;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            padding: 10px;
-            background: #0f3460;
-            border-radius: 5px;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #ff4757;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            color: white;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
+        
+        @media print {
+            .no-print {
+                display: none !important;
             }
             
-            .vital-signs {
-                width: 100%;
-                flex-direction: row;
-                overflow-x: auto;
+            body {
+                background: white;
             }
             
-            .vital-card {
-                min-width: 150px;
+            .card {
+                box-shadow: none;
+                break-inside: avoid;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
+<body class="p-4 md:p-6">
+    <div class="max-w-7xl mx-auto">
         <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <div class="heart-icon">❤️</div>
-                <h1>ECG Monitor Pro</h1>
-            </div>
-            <div class="datetime" id="datetime"></div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Vital Signs Panel -->
-            <div class="vital-signs">
-                <div class="vital-card hr">
-                    <div class="vital-label">NHỊP TIM</div>
-                    <div class="vital-value">
-                        <span id="heartRate">72</span>
-                        <span class="vital-unit">bpm</span>
-                    </div>
+        <div class="bg-white rounded-2xl p-6 mb-6 gradient-border shadow-xl">
+            <div class="flex items-center justify-center gap-4 mb-4">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-3xl text-white pulse">
+                    <i class="fas fa-microscope"></i>
                 </div>
-
-                <div class="vital-card bp">
-                    <div class="vital-label">HUYẾT ÁP</div>
-                    <div class="vital-value">
-                        <span id="bpSys">120</span>
-                        <span class="vital-unit">mmHg</span>
-                    </div>
-                    <div class="vital-subvalue" id="bpDia">80 mmHg</div>
-                </div>
-
-                <div class="vital-card spo2">
-                    <div class="vital-label">SpO₂</div>
-                    <div class="vital-value">
-                        <span id="spo2">98</span>
-                        <span class="vital-unit">%</span>
-                    </div>
-                </div>
-
-                <div class="vital-card temp">
-                    <div class="vital-label">NHIỆT ĐỘ</div>
-                    <div class="vital-value">
-                        <span id="temp">36.8</span>
-                        <span class="vital-unit">°C</span>
-                    </div>
-                </div>
-
-                <div class="vital-card resp">
-                    <div class="vital-label">NHỊP THỞ</div>
-                    <div class="vital-value">
-                        <span id="respRate">16</span>
-                        <span class="vital-unit">bpm</span>
-                    </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">VetLab Blood Parasites Diagnose</h1>
+                    <p class="text-sm text-gray-600 mt-1">Hệ thống chẩn đoán ký sinh trùng máu qua xét nghiệm huyết học</p>
                 </div>
             </div>
-
-            <!-- ECG Display -->
-            <div class="ecg-display">
-                <div class="ecg-controls">
-                    <div class="control-group">
-                        <label>Tốc độ:</label>
-                        <select id="speed">
-                            <option value="25">25 mm/s</option>
-                            <option value="50" selected>50 mm/s</option>
-                            <option value="100">100 mm/s</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <label>Độ nhạy:</label>
-                        <select id="sensitivity">
-                            <option value="5">5 mm/mV</option>
-                            <option value="10" selected>10 mm/mV</option>
-                            <option value="20">20 mm/mV</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <label>Lead:</label>
-                        <select id="lead">
-                            <option value="I">Lead I</option>
-                            <option value="II" selected>Lead II</option>
-                            <option value="III">Lead III</option>
-                            <option value="aVR">aVR</option>
-                            <option value="aVL">aVL</option>
-                            <option value="aVF">aVF</option>
-                        </select>
-                    </div>
-                    <button id="pauseBtn" onclick="togglePause()">⏸️ TẠM DỪNG</button>
-                    <button onclick="showPatientInfo()">👤 BỆNH NHÂN</button>
-                    <button onclick="printECG()">🖨️ IN</button>
-                    <button id="alarmBtn" onclick="toggleAlarm()">🔔 BÁO ĐỘNG</button>
-                </div>
-
-                <div class="ecg-monitor">
-                    <div class="ecg-grid"></div>
-                    
-                    <div class="ecg-channel">
-                        <span class="channel-label">Lead II</span>
-                        <canvas class="ecg-wave" id="ecgCanvas1"></canvas>
-                    </div>
-                    
-                    <div class="ecg-channel">
-                        <span class="channel-label">Lead V1</span>
-                        <canvas class="ecg-wave" id="ecgCanvas2"></canvas>
-                    </div>
-                    
-                    <div class="ecg-channel">
-                        <span class="channel-label">Lead V5</span>
-                        <canvas class="ecg-wave" id="ecgCanvas3"></canvas>
-                    </div>
-                    
-                    <div class="ecg-channel">
-                        <span class="channel-label">SpO₂</span>
-                        <canvas class="ecg-wave" id="ecgCanvas4"></canvas>
-                    </div>
-                </div>
+            <div class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-1 rounded-full text-xs font-semibold">
+                Developed by Minh Hung
             </div>
         </div>
 
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="status-item">
-                <span class="status-indicator"></span>
-                <span>Kết nối ổn định</span>
-            </div>
-            <div class="status-item">
-                <span>Pin: 85%</span>
-            </div>
-            <div class="status-item">
-                <span>Bộ nhớ: 2.3 GB khả dụng</span>
-            </div>
-            <div class="status-item">
-                <span>Ghi: 00:15:23</span>
-            </div>
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Input Panel -->
+            <div class="bg-white rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center gap-3 pb-4 border-b-2 border-gray-100 mb-5">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">Nhập Kết Quả Xét Nghiệm</h2>
+                </div>
 
-        <!-- Alarm Panel -->
-        <div class="alarm-panel" id="alarmPanel">
-            <h3>⚠️ CẢNH BÁO</h3>
-            <p>Nhịp tim bất thường!</p>
-            <p>HR > 100 bpm</p>
-        </div>
+                <!-- Animal Selection -->
+                <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
+                    <button id="dogBtn" class="animal-btn active flex flex-col items-center p-3 rounded-xl border-2 border-blue-500 bg-blue-50 text-blue-600 transition-all">
+                        <span class="text-2xl mb-1">🐕</span>
+                        <span class="text-xs font-semibold">Chó</span>
+                    </button>
+                    <button id="catBtn" class="animal-btn flex flex-col items-center p-3 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all">
+                        <span class="text-2xl mb-1">🐈</span>
+                        <span class="text-xs font-semibold">Mèo</span>
+                    </button>
+                    <button id="cattleBtn" class="animal-btn flex flex-col items-center p-3 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all">
+                        <span class="text-2xl mb-1">🐄</span>
+                        <span class="text-xs font-semibold">Bò</span>
+                    </button>
+                    <button id="horseBtn" class="animal-btn flex flex-col items-center p-3 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all">
+                        <span class="text-2xl mb-1">🐎</span>
+                        <span class="text-xs font-semibold">Ngựa</span>
+                    </button>
+                    <button id="pigBtn" class="animal-btn flex flex-col items-center p-3 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all">
+                        <span class="text-2xl mb-1">🐖</span>
+                        <span class="text-xs font-semibold">Heo</span>
+                    </button>
+                    <button id="chickenBtn" class="animal-btn flex flex-col items-center p-3 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all">
+                        <span class="text-2xl mb-1">🐓</span>
+                        <span class="text-xs font-semibold">Gà</span>
+                    </button>
+                </div>
 
-        <!-- Patient Info Modal -->
-        <div class="patient-info" id="patientInfo">
-            <button class="close-btn" onclick="closePatientInfo()">✕</button>
-            <h2>Thông Tin Bệnh Nhân</h2>
-            <div class="info-row">
-                <span>Họ tên:</span>
-                <span>Nguyễn Văn A</span>
+                <!-- Input Fields -->
+                <form id="bloodTestForm">
+                    <div class="space-y-4">
+                        <!-- WBC -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-medium text-gray-700">Tổng số bạch cầu (WBC)</label>
+                                <span id="wbcRange" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">6-17 ×10³/μL</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" step="0.01" id="wbc" required class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all pr-20">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">×10³/μL</span>
+                            </div>
+                        </div>
+
+                        <!-- Eosinophils -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-medium text-gray-700">Bạch cầu ái toan (Eosinophils)</label>
+                                <span id="eosRange" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">0.1-1.25 ×10³/μL</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" step="0.01" id="eosinophils" required class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all pr-20">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">×10³/μL</span>
+                            </div>
+                        </div>
+
+                        <!-- Lymphocytes -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-medium text-gray-700">Bạch cầu lympho (Lymphocytes)</label>
+                                <span id="lymphRange" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">1.0-4.8 ×10³/μL</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" step="0.01" id="lymphocytes" required class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all pr-20">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">×10³/μL</span>
+                            </div>
+                        </div>
+
+                        <!-- RBC -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-medium text-gray-700">Tổng số hồng cầu (RBC)</label>
+                                <span id="rbcRange" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">5.5-8.5 ×10⁶/μL</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" step="0.01" id="rbc" required class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all pr-20">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">×10⁶/μL</span>
+                            </div>
+                        </div>
+
+                        <!-- HCT -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-medium text-gray-700">Hematocrit (HCT)</label>
+                                <span id="hctRange" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">37-55 %</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" step="0.1" id="hct" required class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all pr-10">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                            </div>
+                        </div>
+
+                        <!-- Hemoglobin -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-medium text-gray-700">Hemoglobin (Hb)</label>
+                                <span id="hbRange" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">12-18 g/dL</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" step="0.1" id="hb" required class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all pr-12">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">g/dL</span>
+                            </div>
+                        </div>
+
+                        <!-- Platelets -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-medium text-gray-700">Tiểu cầu (Platelets)</label>
+                                <span id="pltRange" class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">200-500 ×10³/μL</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" step="1" id="platelets" required class="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all pr-20">
+                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">×10³/μL</span>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="grid grid-cols-2 gap-3 mt-6">
+                            <button type="submit" class="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg">
+                                <i class="fas fa-search"></i>
+                                <span>Phân Tích Kết Quả</span>
+                            </button>
+                            <button type="button" id="clearBtn" class="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Xóa</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="info-row">
-                <span>Mã BN:</span>
-                <span>BN2024001</span>
-            </div>
-            <div class="info-row">
-                <span>Tuổi:</span>
-                <span>45</span>
-            </div>
-            <div class="info-row">
-                <span>Giới tính:</span>
-                <span>Nam</span>
-            </div>
-            <div class="info-row">
-                <span>Phòng:</span>
-                <span>ICU-01</span>
-            </div>
-            <div class="info-row">
-                <span>Ngày nhập viện:</span>
-                <span>15/03/2024</span>
-            </div>
-            <div class="info-row">
-                <span>Chẩn đoán:</span>
-                <span>Rối loạn nhịp tim</span>
+
+            <!-- Results Panel -->
+            <div class="bg-white rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center gap-3 pb-4 border-b-2 border-gray-100 mb-5">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-800">Kết Quả Chẩn Đoán</h2>
+                </div>
+
+                <!-- Loading -->
+                <div id="loader" class="hidden text-center py-10">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-500 rounded-full spin"></div>
+                    </div>
+                    <p class="text-gray-600">Đang phân tích dữ liệu xét nghiệm...</p>
+                </div>
+
+                <!-- Results Container -->
+                <div id="resultsContainer" class="hidden">
+                    <!-- Results will be dynamically inserted here -->
+                </div>
+
+                <!-- Default Message -->
+                <div id="defaultMessage" class="text-center py-10 text-gray-500">
+                    <div class="text-5xl mb-4">🔬</div>
+                    <p>Vui lòng nhập kết quả xét nghiệm máu để bắt đầu chẩn đoán</p>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Print Button -->
+    <button id="printBtn" class="no-print fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full flex items-center justify-center text-xl shadow-lg transition-all transform hover:scale-110">
+        <i class="fas fa-print"></i>
+    </button>
+
     <script>
-        // Update datetime
-        function updateDateTime() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            document.getElementById('datetime').textContent = 
-                now.toLocaleDateString('vi-VN', options);
+        // Global variables
+        let currentSpecies = 'dog';
+
+        // Reference ranges for different species
+        const referenceRanges = {
+            dog: {
+                wbc: { min: 6, max: 17, unit: '×10³/μL' },
+                eosinophils: { min: 0.1, max: 1.25, unit: '×10³/μL' },
+                lymphocytes: { min: 1.0, max: 4.8, unit: '×10³/μL' },
+                rbc: { min: 5.5, max: 8.5, unit: '×10⁶/μL' },
+                hct: { min: 37, max: 55, unit: '%' },
+                hb: { min: 12, max: 18, unit: 'g/dL' },
+                platelets: { min: 200, max: 500, unit: '×10³/μL' }
+            },
+            cat: {
+                wbc: { min: 5.5, max: 19.5, unit: '×10³/μL' },
+                eosinophils: { min: 0.1, max: 1.5, unit: '×10³/μL' },
+                lymphocytes: { min: 1.5, max: 7.0, unit: '×10³/μL' },
+                rbc: { min: 5.0, max: 10.0, unit: '×10⁶/μL' },
+                hct: { min: 30, max: 45, unit: '%' },
+                hb: { min: 10, max: 15, unit: 'g/dL' },
+                platelets: { min: 150, max: 400, unit: '×10³/μL' }
+            },
+            cattle: {
+                wbc: { min: 4, max: 12, unit: '×10³/μL' },
+                eosinophils: { min: 0.1, max: 1.0, unit: '×10³/μL' },
+                lymphocytes: { min: 2.5, max: 7.5, unit: '×10³/μL' },
+                rbc: { min: 5.0, max: 10.0, unit: '×10⁶/μL' },
+                hct: { min: 24, max: 46, unit: '%' },
+                hb: { min: 8, max: 15, unit: 'g/dL' },
+                platelets: { min: 100, max: 800, unit: '×10³/μL' }
+            },
+            horse: {
+                wbc: { min: 5.5, max: 12.5, unit: '×10³/μL' },
+                eosinophils: { min: 0.1, max: 1.0, unit: '×10³/μL' },
+                lymphocytes: { min: 1.5, max: 5.5, unit: '×10³/μL' },
+                rbc: { min: 6.5, max: 12.5, unit: '×10⁶/μL' },
+                hct: { min: 32, max: 52, unit: '%' },
+                hb: { min: 11, max: 19, unit: 'g/dL' },
+                platelets: { min: 100, max: 600, unit: '×10³/μL' }
+            },
+            pig: {
+                wbc: { min: 11, max: 22, unit: '×10³/μL' },
+                eosinophils: { min: 0.5, max: 2.5, unit: '×10³/μL' },
+                lymphocytes: { min: 4.5, max: 13.0, unit: '×10³/μL' },
+                rbc: { min: 5.0, max: 8.0, unit: '×10⁶/μL' },
+                hct: { min: 32, max: 50, unit: '%' },
+                hb: { min: 10, max: 16, unit: 'g/dL' },
+                platelets: { min: 200, max: 500, unit: '×10³/μL' }
+            },
+            chicken: {
+                wbc: { min: 12, max: 30, unit: '×10³/μL' },
+                eosinophils: { min: 0.5, max: 3.0, unit: '×10³/μL' },
+                lymphocytes: { min: 7.0, max: 15.0, unit: '×10³/μL' },
+                rbc: { min: 2.5, max: 3.5, unit: '×10⁶/μL' },
+                hct: { min: 22, max: 35, unit: '%' },
+                hb: { min: 7, max: 13, unit: 'g/dL' },
+                platelets: { min: 20, max: 30, unit: '×10³/μL' }
+            }
+        };
+
+        // Parasite Database
+        const parasiteDB = {
+            babesia: {
+                name: 'Babesia spp.',
+                vietnameseName: 'Ký sinh trùng Babesia',
+                affectedSpecies: ['dog', 'cat', 'cattle', 'horse'],
+                patterns: {
+                    rbc: 'low',
+                    hct: 'low',
+                    hb: 'low',
+                    platelets: 'low',
+                    wbc: 'variable'
+                },
+                clinicalSigns: 'Thiếu máu tan máu, sốt, vàng da niêm mạc, nước tiểu sẫm màu (đỏ hoặc nâu), suy nhược',
+                treatment: 'Imidocarb dipropionate (6.6 mg/kg, IM, 2 lần cách 14 ngày) hoặc Diminazene aceturate (3.5 mg/kg, IM)',
+                diagnostic: 'Phết máu nhuộm Giemsa, PCR, ELISA'
+            },
+            ehrlichia: {
+                name: 'Ehrlichia canis',
+                vietnameseName: 'Ký sinh trùng Ehrlichia',
+                affectedSpecies: ['dog'],
+                patterns: {
+                    platelets: 'very_low',
+                    wbc: 'low',
+                    rbc: 'low',
+                    lymphocytes: 'high',
+                    eosinophils: 'normal'
+                },
+                clinicalSigns: 'Sốt, chảy máu cam, xuất huyết dưới da, sưng hạch lympho, viêm màng bồ đào',
+                treatment: 'Doxycycline (5-10 mg/kg, PO, BID, 28 ngày) hoặc Tetracycline (22 mg/kg, PO, TID, 21 ngày)',
+                diagnostic: 'PCR, IFA, phết máu (morulae trong bạch cầu đơn nhân)'
+            },
+            anaplasma: {
+                name: 'Anaplasma spp.',
+                vietnameseName: 'Ký sinh trùng Anaplasma',
+                affectedSpecies: ['dog', 'cat', 'cattle', 'horse'],
+                patterns: {
+                    platelets: 'low',
+                    wbc: 'low',
+                    rbc: 'low',
+                    hct: 'low'
+                },
+                clinicalSigns: 'Sốt chu kỳ, thiếu máu, vàng da, chán ăn, suy nhược, có thể xuất huyết',
+                treatment: 'Doxycycline (5 mg/kg, PO, BID, 14-28 ngày) hoặc Oxytetracycline (20 mg/kg, IV/IM)',
+                diagnostic: 'PCR, ELISA, phết máu (inclusion bodies trong bạch cầu trung tính)'
+            },
+            hepatozoon: {
+                name: 'Hepatozoon canis',
+                vietnameseName: 'Ký sinh trùng Hepatozoon',
+                affectedSpecies: ['dog', 'cat'],
+                patterns: {
+                    wbc: 'very_high',
+                    eosinophils: 'high',
+                    rbc: 'low',
+                    hct: 'low'
+                },
+                clinicalSigns: 'Sốt cao, đau cơ, đau xương, sút cân, tiết dịch mắt mũi, cứng cơ',
+                treatment: 'Imidocarb dipropionate + NSAIDs + Doxycycline, điều trị hỗ trợ lâu dài',
+                diagnostic: 'Phết máu (gamont trong bạch cầu trung tính), sinh thiết cơ, PCR'
+            },
+            trypanosoma: {
+                name: 'Trypanosoma spp.',
+                vietnameseName: 'Ký sinh trùng Trypanosoma',
+                affectedSpecies: ['cattle', 'horse', 'pig'],
+                patterns: {
+                    rbc: 'low',
+                    hct: 'low',
+                    wbc: 'high',
+                    lymphocytes: 'high'
+                },
+                clinicalSigns: 'Sốt không đều, phù nề chi và bụng, thiếu máu tiến triển, suy nhược, giảm sản xuất',
+                treatment: 'Diminazene aceturate (3.5-7 mg/kg) hoặc Suramin (10 mg/kg)',
+                diagnostic: 'Phết máu tươi, phết máu nhuộm Giemsa, CATT test'
+            },
+            microfilaria: {
+                name: 'Microfilaria (Dirofilaria immitis)',
+                vietnameseName: 'Ấu trùng giun tim',
+                affectedSpecies: ['dog', 'cat'],
+                patterns: {
+                    eosinophils: 'high',
+                    wbc: 'high',
+                    platelets: 'normal',
+                    rbc: 'normal'
+                },
+                clinicalSigns: 'Ho mãn tính, khó thở, mệt mỏi khi vận động, cổ trướng, suy tim phải',
+                treatment: 'Ivermectin + Doxycycline, sau đó Melarsomine (điều trị giun trưởng thành)',
+                diagnostic: 'Modified Knott test, ELISA antigen test, siêu âm tim'
+            },
+            leishmania: {
+                name: 'Leishmania infantum',
+                vietnameseName: 'Ký sinh trùng Leishmania',
+                affectedSpecies: ['dog'],
+                patterns: {
+                    rbc: 'low',
+                    platelets: 'low',
+                    wbc: 'variable',
+                    lymphocytes: 'high'
+                },
+                clinicalSigns: 'Tổn thương da (viêm da, rụng lông), sưng hạch, sút cân, viêm thận, viêm khớp',
+                treatment: 'Meglumine antimoniate + Allopurinol hoặc Miltefosine + Allopurinol',
+                diagnostic: 'ELISA, IFA, PCR, cytology (amastigotes)'
+            },
+            theileria: {
+                name: 'Theileria spp.',
+                vietnameseName: 'Ký sinh trùng Theileria',
+                affectedSpecies: ['cattle'],
+                patterns: {
+                    rbc: 'very_low',
+                    hct: 'very_low',
+                    hb: 'very_low',
+                    wbc: 'low',
+                    lymphocytes: 'high'
+                },
+                clinicalSigns: 'Sốt cao đột ngột, thiếu máu nặng, vàng da, sưng hạch ngoại vi, khó thở',
+                treatment: 'Buparvaquone (2.5 mg/kg, IM) hoặc Halofuginone',
+                diagnostic: 'Phết máu nhuộm Giemsa (piroplasms trong hồng cầu), PCR'
+            }
+        };
+
+        // DOM Elements
+        const animalButtons = {
+            dog: document.getElementById('dogBtn'),
+            cat: document.getElementById('catBtn'),
+            cattle: document.getElementById('cattleBtn'),
+            horse: document.getElementById('horseBtn'),
+            pig: document.getElementById('pigBtn'),
+            chicken: document.getElementById('chickenBtn')
+        };
+
+        const rangeElements = {
+            wbc: document.getElementById('wbcRange'),
+            eosinophils: document.getElementById('eosRange'),
+            lymphocytes: document.getElementById('lymphRange'),
+            rbc: document.getElementById('rbcRange'),
+            hct: document.getElementById('hctRange'),
+            hb: document.getElementById('hbRange'),
+            platelets: document.getElementById('pltRange')
+        };
+
+        const form = document.getElementById('bloodTestForm');
+        const clearBtn = document.getElementById('clearBtn');
+        const printBtn = document.getElementById('printBtn');
+        const loader = document.getElementById('loader');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const defaultMessage = document.getElementById('defaultMessage');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animal selection
+            Object.keys(animalButtons).forEach(species => {
+                animalButtons[species].addEventListener('click', () => selectAnimal(species));
+            });
+
+            // Form submission
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                analyzeBloodTest();
+            });
+
+            // Clear button
+            clearBtn.addEventListener('click', clearForm);
+
+            // Print button
+            printBtn.addEventListener('click', () => window.print());
+
+            // Initialize reference ranges
+            updateReferenceRanges();
+        });
+
+        // Select animal species
+        function selectAnimal(species) {
+            currentSpecies = species;
+            
+            // Update UI
+            Object.keys(animalButtons).forEach(key => {
+                animalButtons[key].classList.remove('active', 'border-blue-500', 'bg-blue-50', 'text-blue-600');
+                animalButtons[key].classList.add('border-gray-200');
+            });
+            
+            animalButtons[species].classList.add('active', 'border-blue-500', 'bg-blue-50', 'text-blue-600');
+            
+            // Update reference ranges
+            updateReferenceRanges();
         }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
 
-        // ECG Wave Animation
-        class ECGWave {
-            constructor(canvasId, color = '#00ff00') {
-                this.canvas = document.getElementById(canvasId);
-                this.ctx = this.canvas.getContext('2d');
-                this.color = color;
-                this.x = 0;
-                this.data = [];
-                this.isPaused = false;
-                
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-                
-                // Generate initial ECG data
-                this.generateECGData();
-                this.animate();
+        // Update reference ranges display
+        function updateReferenceRanges() {
+            const ranges = referenceRanges[currentSpecies];
+            
+            rangeElements.wbc.textContent = `${ranges.wbc.min}-${ranges.wbc.max} ${ranges.wbc.unit}`;
+            rangeElements.eosinophils.textContent = `${ranges.eosinophils.min}-${ranges.eosinophils.max} ${ranges.eosinophils.unit}`;
+            rangeElements.lymphocytes.textContent = `${ranges.lymphocytes.min}-${ranges.lymphocytes.max} ${ranges.lymphocytes.unit}`;
+            rangeElements.rbc.textContent = `${ranges.rbc.min}-${ranges.rbc.max} ${ranges.rbc.unit}`;
+            rangeElements.hct.textContent = `${ranges.hct.min}-${ranges.hct.max} ${ranges.hct.unit}`;
+            rangeElements.hb.textContent = `${ranges.hb.min}-${ranges.hb.max} ${ranges.hb.unit}`;
+            rangeElements.platelets.textContent = `${ranges.platelets.min}-${ranges.platelets.max} ${ranges.platelets.unit}`;
+        }
+
+        // Analyze blood test
+        function analyzeBloodTest() {
+            // Get input values
+            const values = {
+                wbc: parseFloat(document.getElementById('wbc').value),
+                eosinophils: parseFloat(document.getElementById('eosinophils').value),
+                lymphocytes: parseFloat(document.getElementById('lymphocytes').value),
+                rbc: parseFloat(document.getElementById('rbc').value),
+                hct: parseFloat(document.getElementById('hct').value),
+                hb: parseFloat(document.getElementById('hb').value),
+                platelets: parseFloat(document.getElementById('platelets').value)
+            };
+            
+            // Validation
+            if (Object.values(values).some(isNaN)) {
+                alert('Vui lòng nhập đầy đủ các giá trị!');
+                return;
             }
+            
+            // Hide default message and show loader
+            defaultMessage.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            loader.classList.remove('hidden');
+            
+            // Simulate processing
+            setTimeout(() => {
+                const analysis = analyzeParameters(values);
+                const diagnosis = diagnoseParasites(analysis);
+                displayResults(analysis, diagnosis);
+                
+                loader.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+                resultsContainer.classList.add('slide-in');
+            }, 1500);
+        }
 
-            resize() {
-                this.canvas.width = this.canvas.offsetWidth;
-                this.canvas.height = this.canvas.offsetHeight;
+        // Analyze parameters
+        function analyzeParameters(values) {
+            const ranges = referenceRanges[currentSpecies];
+            const analysis = {};
+            
+            for (const [param, value] of Object.entries(values)) {
+                const range = ranges[param];
+                let status = 'normal';
+                let severity = 0;
+                
+                if (value < range.min) {
+                    status = 'low';
+                    severity = ((range.min - value) / range.min) * 100;
+                    if (severity > 30) status = 'very_low';
+                } else if (value > range.max) {
+                    status = 'high';
+                    severity = ((value - range.max) / range.max) * 100;
+                    if (severity > 30) status = 'very_high';
+                }
+                
+                analysis[param] = {
+                    value: value,
+                    status: status,
+                    severity: severity,
+                    range: range
+                };
             }
+            
+            return analysis;
+        }
 
-            generateECGData() {
-                // Generate realistic ECG pattern
-                const pattern = [];
-                
-                // P wave
-                for(let i = 0; i < 10; i++) {
-                    pattern.push(Math.sin(i * 0.3) * 10);
+        // Diagnose parasites
+        function diagnoseParasites(analysis) {
+            const possibleDiagnoses = [];
+            
+            for (const [parasiteName, parasite] of Object.entries(parasiteDB)) {
+                // Check if parasite affects current species
+                if (!parasite.affectedSpecies.includes(currentSpecies)) {
+                    continue;
                 }
                 
-                // Baseline
-                for(let i = 0; i < 15; i++) {
-                    pattern.push(0);
-                }
+                let score = 0;
+                let matches = [];
                 
-                // QRS complex
-                pattern.push(-15); // Q
-                pattern.push(60);  // R
-                pattern.push(-10); // S
-                
-                // Baseline
-                for(let i = 0; i < 20; i++) {
-                    pattern.push(0);
-                }
-                
-                // T wave
-                for(let i = 0; i < 15; i++) {
-                    pattern.push(Math.sin(i * 0.2) * 20);
-                }
-                
-                // Baseline
-                for(let i = 0; i < 40; i++) {
-                    pattern.push(0);
-                }
-                
-                this.data = pattern;
-            }
-
-            animate() {
-                if (!this.isPaused) {
-                    this.draw();
-                }
-                requestAnimationFrame(() => this.animate());
-            }
-
-            draw() {
-                const { width, height } = this.canvas;
-                const centerY = height / 2;
-                
-                // Clear the swept area
-                this.ctx.fillStyle = '#000';
-                this.ctx.fillRect(this.x, 0, 50, height);
-                
-                // Draw the ECG wave
-                this.ctx.strokeStyle = this.color;
-                this.ctx.lineWidth = 2;
-                this.ctx.shadowBlur = 4;
-                this.ctx.shadowColor = this.color;
-                
-                this.ctx.beginPath();
-                
-                const dataIndex = Math.floor(this.x / 2) % this.data.length;
-                const startX = Math.max(0, this.x - 200);
-                
-                for(let i = startX; i < this.x; i += 2) {
-                    const idx = Math.floor(i / 2) % this.data.length;
-                    const y = centerY - this.data[idx];
+                for (const [param, expectedPattern] of Object.entries(parasite.patterns)) {
+                    const actualStatus = analysis[param]?.status;
                     
-                    if(i === startX) {
-                        this.ctx.moveTo(i, y);
-                    } else {
-                        this.ctx.lineTo(i, y);
+                    if (expectedPattern === 'variable') {
+                        score += 0.3;
+                    } else if (matchPattern(actualStatus, expectedPattern)) {
+                        score += 1;
+                        matches.push({
+                            param: param,
+                            expected: expectedPattern,
+                            actual: actualStatus
+                        });
                     }
                 }
                 
-                this.ctx.stroke();
+                const probability = (score / Object.keys(parasite.patterns).length) * 100;
                 
-                // Draw the sweep line
-                this.ctx.strokeStyle = '#ffffff30';
-                this.ctx.lineWidth = 1;
-                this.ctx.beginPath();
-                this.ctx.moveTo(this.x + 5, 0);
-                this.ctx.lineTo(this.x + 5, height);
-                this.ctx.stroke();
-                
-                // Update position
-                this.x += 2;
-                if(this.x > width) {
-                    this.x = 0;
+                if (probability >= 30) {
+                    possibleDiagnoses.push({
+                        ...parasite,
+                        probability: probability,
+                        matches: matches
+                    });
                 }
             }
-
-            pause() {
-                this.isPaused = true;
-            }
-
-            resume() {
-                this.isPaused = false;
-            }
+            
+            // Sort by probability
+            possibleDiagnoses.sort((a, b) => b.probability - a.probability);
+            
+            return possibleDiagnoses;
         }
 
-        // Initialize ECG waves
-        const ecg1 = new ECGWave('ecgCanvas1', '#00ff00');
-        const ecg2 = new ECGWave('ecgCanvas2', '#00ff00');
-        const ecg3 = new ECGWave('ecgCanvas3', '#00ff00');
-        const ecg4 = new ECGWave('ecgCanvas4', '#ffff00');
-
-        // Simulate vital signs changes
-        function updateVitalSigns() {
-            const hr = document.getElementById('heartRate');
-            const currentHR = parseInt(hr.textContent);
-            const newHR = currentHR + Math.floor(Math.random() * 5 - 2);
-            hr.textContent = Math.max(60, Math.min(100, newHR));
-            
-            const spo2 = document.getElementById('spo2');
-            const currentSpO2 = parseInt(spo2.textContent);
-            const newSpO2 = currentSpO2 + Math.floor(Math.random() * 3 - 1);
-            spo2.textContent = Math.max(95, Math.min(100, newSpO2));
-            
-            const temp = document.getElementById('temp');
-            const currentTemp = parseFloat(temp.textContent);
-            const newTemp = currentTemp + (Math.random() * 0.2 - 0.1);
-            temp.textContent = Math.max(36.0, Math.min(37.5, newTemp)).toFixed(1);
-            
-            const resp = document.getElementById('respRate');
-            const currentResp = parseInt(resp.textContent);
-            const newResp = currentResp + Math.floor(Math.random() * 3 - 1);
-            resp.textContent = Math.max(12, Math.min(20, newResp));
-
-            // Check for alarms
-            if(parseInt(hr.textContent) > 90) {
-                document.getElementById('alarmPanel').classList.add('active');
-            }
+        // Pattern matching helper
+        function matchPattern(actual, expected) {
+            if (expected === actual) return true;
+            if (expected === 'low' && (actual === 'low' || actual === 'very_low')) return true;
+            if (expected === 'high' && (actual === 'high' || actual === 'very_high')) return true;
+            if (expected === 'very_low' && actual === 'very_low') return true;
+            if (expected === 'very_high' && actual === 'very_high') return true;
+            return false;
         }
-        setInterval(updateVitalSigns, 3000);
 
-        // Control functions
-        let isPaused = false;
-        function togglePause() {
-            isPaused = !isPaused;
-            const btn = document.getElementById('pauseBtn');
+        // Display results
+        function displayResults(analysis, diagnosis) {
+            let html = '';
             
-            if(isPaused) {
-                ecg1.pause();
-                ecg2.pause();
-                ecg3.pause();
-                ecg4.pause();
-                btn.textContent = '▶️ TIẾP TỤC';
-                btn.classList.add('active');
+            // Parameter Analysis
+            html += '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">';
+            for (const [param, data] of Object.entries(analysis)) {
+                const statusClass = data.status.includes('low') ? 'bg-blue-50 border-blue-200' : 
+                                   data.status.includes('high') ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
+                const statusText = getStatusText(data.status);
+                const paramName = getParameterName(param);
+                
+                html += `
+                    <div class="p-3 rounded-xl border-2 ${statusClass}">
+                        <div class="text-xs text-gray-500 mb-1">${paramName}</div>
+                        <div class="text-lg font-bold text-gray-800">${data.value}</div>
+                        <div class="text-xs font-medium ${
+                            data.status.includes('low') ? 'text-blue-600' : 
+                            data.status.includes('high') ? 'text-red-600' : 'text-green-600'
+                        }">${statusText}</div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            
+            // Diagnosis Results
+            if (diagnosis.length > 0) {
+                html += '<h3 class="text-lg font-semibold text-gray-800 mb-4">🦠 Chẩn Đoán Ký Sinh Trùng</h3>';
+                
+                diagnosis.forEach((parasite, index) => {
+                    const riskClass = parasite.probability >= 70 ? 'border-l-4 border-red-500 bg-red-50' : 
+                                     parasite.probability >= 50 ? 'border-l-4 border-yellow-500 bg-yellow-50' : 'border-l-4 border-green-500 bg-green-50';
+                    const probClass = parasite.probability >= 70 ? 'bg-red-500 text-white' : 
+                                     parasite.probability >= 50 ? 'bg-yellow-500 text-white' : 'bg-gray-400 text-white';
+                    
+                    html += `
+                        <div class="mb-4 rounded-xl p-4 ${riskClass}">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <div class="font-bold text-gray-800">${parasite.vietnameseName}</div>
+                                    <div class="text-sm text-gray-600 italic">${parasite.name}</div>
+                                </div>
+                                <div class="px-3 py-1 rounded-full text-sm font-bold ${probClass}">
+                                    ${Math.round(parasite.probability)}%
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="text-xs text-gray-500 uppercase tracking-wide mb-2">Bằng chứng xét nghiệm</div>
+                                <ul class="space-y-1">
+                                    ${parasite.matches.map(m => `
+                                        <li class="flex items-center text-sm">
+                                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                            <span>${getParameterName(m.param)}: ${getStatusText(m.actual)}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            
+                            ${parasite.probability >= 50 ? `
+                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                    <div class="flex items-center text-blue-600 font-medium mb-2">
+                                        <i class="fas fa-pills mr-2"></i>
+                                        <span>Phác đồ điều trị</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 mb-3">${parasite.treatment}</p>
+                                    
+                                    <div class="bg-amber-50 rounded-lg p-3">
+                                        <div class="font-medium text-amber-800 mb-1">Triệu chứng lâm sàng</div>
+                                        <p class="text-sm text-amber-700">${parasite.clinicalSigns}</p>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
             } else {
-                ecg1.resume();
-                ecg2.resume();
-                ecg3.resume();
-                ecg4.resume();
-                btn.textContent = '⏸️ TẠM DỪNG';
-                btn.classList.remove('active');
+                html += `
+                    <div class="text-center py-8 bg-green-50 rounded-xl border border-green-200">
+                        <div class="text-4xl mb-3">✅</div>
+                        <h3 class="text-lg font-semibold text-green-700 mb-2">Không phát hiện ký sinh trùng máu</h3>
+                        <p class="text-gray-600">Các chỉ số xét nghiệm không cho thấy dấu hiệu nhiễm ký sinh trùng máu điển hình</p>
+                    </div>
+                `;
             }
+            
+            // Recommendations
+            html += `
+                <div class="bg-amber-50 rounded-xl p-4 mt-4 border border-amber-200">
+                    <div class="flex items-center text-amber-800 font-bold mb-3">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        <span>Khuyến Nghị</span>
+                    </div>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center text-xs font-bold text-amber-800 mr-2 mt-0.5 flex-shrink-0">1</div>
+                            <span class="text-sm text-amber-700">Thực hiện xét nghiệm phết máu nhuộm Giemsa để xác định trực tiếp ký sinh trùng</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center text-xs font-bold text-amber-800 mr-2 mt-0.5 flex-shrink-0">2</div>
+                            <span class="text-sm text-amber-700">Xét nghiệm PCR hoặc ELISA để xác định chính xác loại ký sinh trùng</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-6 h-6 bg-white rounded-full flex items-center justify-center text-xs font-bold text-amber-800 mr-2 mt-0.5 flex-shrink-0">3</div>
+                            <span class="text-sm text-amber-700">Đánh giá triệu chứng lâm sàng kết hợp với kết quả xét nghiệm</span>
+                        </li>
+                        ${diagnosis.length > 0 && diagnosis[0].probability >= 70 ? `
+                            <li class="flex items-start pt-2 border-t border-amber-100">
+                                <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white mr-2 mt-0.5 flex-shrink-0">!</div>
+                                <span class="text-sm font-bold text-red-600">Khả năng nhiễm cao - Cần điều trị ngay lập tức</span>
+                            </li>
+                        ` : ''}
+                    </ul>
+                </div>
+            `;
+            
+            // Warning
+            html += `
+                <div class="bg-red-50 rounded-xl p-4 mt-4 border border-red-200 flex">
+                    <div class="text-red-500 text-xl mr-3 mt-0.5">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="text-sm text-red-700">
+                        <span class="font-bold">Lưu ý quan trọng:</span> Đây chỉ là công cụ hỗ trợ chẩn đoán sơ bộ. 
+                        Chẩn đoán xác định cần dựa trên xét nghiệm trực tiếp tìm ký sinh trùng, 
+                        triệu chứng lâm sàng và đánh giá của bác sĩ thú y.
+                    </div>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = html;
         }
 
-        function showPatientInfo() {
-            document.getElementById('patientInfo').classList.add('active');
+        // Helper functions
+        function getParameterName(param) {
+            const names = {
+                wbc: 'Bạch cầu',
+                eosinophils: 'BC ái toan',
+                lymphocytes: 'BC lympho',
+                rbc: 'Hồng cầu',
+                hct: 'Hematocrit',
+                hb: 'Hemoglobin',
+                platelets: 'Tiểu cầu'
+            };
+            return names[param] || param;
         }
 
-        function closePatientInfo() {
-            document.getElementById('patientInfo').classList.remove('active');
+        function getStatusText(status) {
+            const texts = {
+                very_low: 'Rất thấp',
+                low: 'Thấp',
+                normal: 'Bình thường',
+                high: 'Cao',
+                very_high: 'Rất cao'
+            };
+            return texts[status] || status;
         }
 
-        function toggleAlarm() {
-            const panel = document.getElementById('alarmPanel');
-            panel.classList.toggle('active');
-        }
-
-        function printECG() {
-            window.print();
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if(e.key === ' ') {
-                e.preventDefault();
-                togglePause();
-            }
-            if(e.key === 'Escape') {
-                closePatientInfo();
-            }
-        });
-
-        // Sound effect for heartbeat (optional)
-        function playHeartbeat() {
-            // This would require an audio file
-            // const audio = new Audio('heartbeat.mp3');
-            // audio.play();
+        // Clear form
+        function clearForm() {
+            form.reset();
+            resultsContainer.classList.add('hidden');
+            defaultMessage.classList.remove('hidden');
         }
     </script>
 </body>
